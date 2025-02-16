@@ -59,7 +59,7 @@ export default function Home() {
       setTimeout(() => {
         clearInterval(timer);
         const text =
-          "若卡在此页面无法跳转可用站点，请点击右下角信息图标联系客服";
+          "若卡在此页面无法跳转可用站点，请联系客服";
         alert(text);
         document.getElementById("info")!.innerText = text;
       }, 60000);
