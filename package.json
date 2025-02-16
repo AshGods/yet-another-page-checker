@@ -1,6 +1,9 @@
 {
-  "name": "customloading",
-  "version": "0.1.0",
+  "name": "yet-another-page-checker",
+  "version": "1.0.0",
+  "description": "一款带动画效果的简单线路检测页",
+  "author": "DyAxy",
+  "license": "GPL-3.0-only",
   "private": true,
   "scripts": {
     "predev": "bun scripts/readEnv.ts",

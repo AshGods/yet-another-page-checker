@@ -90,3 +90,6 @@ NEXT_PUBLIC_DOMAIN_3_SITE="https://example3.com"
     ```bash
     bun run build
     ```
+## 许可证
+
+本项目基于 GPL-3.0 许可证发布。详细信息请参见 [LICENSE](LICENSE) 文件。
