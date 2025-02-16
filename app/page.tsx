@@ -1,119 +1,147 @@
 "use client";
 
-import { Link } from "@heroui/react";
+import { type ReactElement } from "react";
 import { motion } from "framer-motion";
-import { lazy, useEffect, useState } from "react";
+import { lazy, useEffect, useCallback, useMemo, use, Suspense } from "react";
+import type { Host } from "./config";
+import { config } from "./config";
+
+interface Link {
+  href: string;
+  children: React.ReactNode;
+}
 
 const ease = [0.16, 1, 0.3, 1];
 const LazySpline = lazy(() => import("@splinetool/react-spline"));
 
-interface Host {
-  api: string;
-  site: string;
+function Link({ href, children }: Link) {
+  return (
+    <a href={href} className="text-blue-400 hover:text-blue-300">
+      {children}
+    </a>
+  );
 }
 
-export default function Home() {
-  const [config, setConfig] = useState({
-    siteName: "",
-    telegramGroup: "",
-    telegramContact: "",
-    domains: [],
-  });
+function PageContent() {
+  // 使用 use hook 来处理 Promise
+  const configuration = use(config);
 
-  const checkDomain = (domains: Array<Host | string>) => {
-    for (let i = 0; i < domains.length; i++) {
-      let api: string;
-      let site: string;
+  const configError = useMemo(() => {
+    const errors: string[] = [];
+    if (!configuration.siteName || configuration.siteName === "加载中...") {
+      errors.push('站点名称未配置');
+    }
+    if (!configuration.telegramLink || configuration.telegramLink === "#") {
+      errors.push('Telegram 群组链接未配置');
+    }
+    if (configuration.domains.length === 0) {
+      errors.push('未配置任何域名');
+    }
+    return errors;
+  }, [configuration]);
 
-      const host = domains[i];
-      if (typeof host === "string") {
-        api = host;
-        site = host;
-      } else {
-        api = host.api;
-        site = host.site;
-      }
+  const checkDomain = useCallback((domains: Array<Host>) => {
+    if (configError.length > 0) return;
+
+    domains.forEach(({ api, site }) => {
       fetch(api).then((res) => {
         if (res.ok && res.status === 200) {
-          window.location.href = site + location.search;
+          if (window.location.hostname === "localhost") { // Dev
+            console.log(`api: ${api} site: ${site}, OK`);
+          } else {
+            window.location.href = site + window.location.search;
+          }
         }
       });
-    }
-  };
-
-  useEffect(() => {
-    fetch("/config.json").then(async (res) => {
-      const data = await res.json();
-      setConfig(data);
     });
-  }, []);
+  }, [configError]);
 
   useEffect(() => {
-    if (config.domains.length === 0) return;
+    if (configError.length > 0) return;
+    if (configuration.domains.length === 0) return;
 
     const timeOut = setTimeout(() => {
-      checkDomain(config.domains);
+      checkDomain(configuration.domains);
       const timer = setInterval(() => {
-        checkDomain(config.domains);
+        checkDomain(configuration.domains);
       }, 3000);
       setTimeout(() => {
         clearInterval(timer);
         const text = "若卡在此页面无法跳转可用站点，请联系客服";
         alert(text);
-        document.getElementById("info")!.innerText = text;
+        const infoElement = document.getElementById("info");
+        if (infoElement) {
+          infoElement.innerText = text;
+        }
       }, 60000);
     }, 3000);
 
     return () => {
       clearTimeout(timeOut);
     };
-  }, [config]);
+  }, [checkDomain, configError, configuration.domains]);
 
   return (
-    <main className="bg-[#2b2b2b] h-screen w-full flex flex-row justify-center items-center">
-      <div className="flex flex-col-reverse w-full lg:grid lg:grid-cols-2 p-6 lg:p-12 overflow-hidden">
-        <div className="flex h-full w-full max-w-3xl flex-col overflow-hidden pt-8 justify-center items-center gap-4">
-          <motion.h1
-            className="text-left text-4xl text-center font-semibold leading-tighter text-foreground sm:text-5xl md:text-6xl"
-            initial={{ filter: "blur(10px)", opacity: 0, y: 50 }}
-            animate={{ filter: "blur(0px)", opacity: 1, y: 0 }}
-            transition={{
-              duration: 1,
-              ease,
-              staggerChildren: 0.2,
-            }}
-          >
-            <motion.span
-              className="text-balance text-white"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.8,
-                delay: 0.5,
-                ease,
-              }}
-            >
-              {config.siteName} <br />
-              线路检测页
-            </motion.span>
-          </motion.h1>
-          <motion.p
-            className="text-center text-lg text-balance"
+    <div className="flex flex-col-reverse w-full lg:grid lg:grid-cols-2 p-6 lg:p-12 overflow-hidden">
+      <div className="flex h-full w-full max-w-3xl flex-col overflow-hidden pt-8 justify-center items-center gap-4">
+        <motion.h1
+          className="lg:text-left text-4xl text-center font-semibold leading-tighter text-foreground sm:text-5xl md:text-6xl"
+          initial={{ filter: "blur(10px)", opacity: 0, y: 50 }}
+          animate={{ filter: "blur(0px)", opacity: 1, y: 0 }}
+          transition={{
+            duration: 1,
+            ease,
+            staggerChildren: 0.2,
+          }}
+        >
+          <motion.span
+            className="text-balance text-white"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              delay: 0.6,
               duration: 0.8,
+              delay: 0.5,
               ease,
             }}
-            id="info"
           >
-            线路测试中
-            <br />
-            将自动跳转最快域名
-            <br />
-            请耐心等候
-          </motion.p>
+            {configuration.siteName} <br />
+            线路检测页
+          </motion.span>
+        </motion.h1>
+        <motion.p
+          className="text-center text-lg text-balance"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            delay: 0.6,
+            duration: 0.8,
+            ease,
+          }}
+          id="info"
+        >
+          {configError.length > 0 ? (
+            <>
+              配置错误：
+              <br />
+              {configError.map((error, index) => (
+                <span key={index} className="text-red-500">
+                  {error}
+                  <br />
+                </span>
+              ))}
+              请参考 README.md 进行配置
+            </>
+          ) : (
+            <>
+              线路测试中
+              <br />
+              将自动跳转最快域名
+              <br />
+              请耐心等候
+            </>
+          )}
+        </motion.p>
+        {configuration.telegramLink !== "#" && (
           <motion.span
             className="inline-block text-sm text-white"
             initial={{ opacity: 0 }}
@@ -121,23 +149,37 @@ export default function Home() {
             transition={{ delay: 1.0, duration: 0.8 }}
           >
             Telegram 群组{" "}
-            <Link href={config.telegramGroup}>
-              @{config.telegramGroup.split("https://t.me/")[1]}
+            <Link href={configuration.telegramLink}>
+              {configuration.telegramLink.split("https://t.me/")[1]}
             </Link>
           </motion.span>
-        </div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="relative h-96"
-        >
-          <LazySpline
-            scene="/scene.splinecode"
-            className="absolute w-full h-full flex items-center justify-center"
-          />
-        </motion.div>
+        )}
       </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 1 }}
+        className="relative h-96"
+      >
+        <LazySpline
+          scene="/scene.splinecode"
+          className="absolute w-full h-full flex items-center justify-center"
+        />
+      </motion.div>
+    </div>
+  );
+}
+
+export default function Home(): ReactElement {
+  return (
+    <main className="bg-[#2b2b2b] h-screen w-full flex flex-row justify-center items-center">
+      <Suspense fallback={
+        <div className="text-white text-2xl">
+          加载中...
+        </div>
+      }>
+        <PageContent />
+      </Suspense>
     </main>
   );
 }
