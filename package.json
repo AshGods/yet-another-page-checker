@@ -1,11 +1,18 @@
 {
-  "name": "customloading",
-  "version": "0.1.0",
+  "name": "yet-another-page-checker",
+  "version": "1.0.0",
+  "description": "一款带动画效果的简单线路检测页",
+  "author": "DyAxy",
+  "license": "GPL-3.0-only",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "predev": "bun scripts/readEnv.ts",
+    "dev": "next dev --turbo",
+    "prebuild": "bun scripts/readEnv.ts",
     "build": "next build",
-    "start": "next start",
+    "postbuild": "bun scripts/postBuild.ts",
+    "prestart": "bun run build",
+    "start": "bun x serve -p 3001 ./out",
     "lint": "next lint"
   },
   "dependencies": {
@@ -21,18 +28,20 @@
     "next": "15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^22.13.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
-    "@eslint/eslintrc": "^3"
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }
