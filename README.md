@@ -8,6 +8,12 @@
 
 下载 Release，解压 html 文件，修改 config.json
 
+### 通过 Vercel 部署
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDyAxy%2Fyet-another-page-checker&project-name=yet-another-page-checker-fork&repository-name=yet-another-page-checker-fork&demo-title=Demo%20App&demo-description=A%20statically%20generated%20example%20page.&demo-url=https%3A%2F%2Fyet-another-page-checker.vercel.app%2F)
+
+部署好之后，在自己的仓库中修改 config.json 即可
+
 ## 开发指南
 
 0. **安装 Bun**:
