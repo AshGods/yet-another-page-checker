@@ -47,9 +47,10 @@ export function PageContent() {
                     transition={{ duration: 0.8, delay: 1 }}
                     className="relative h-96"
                 >
-                    <LazySpline
-                        scene="/scene.splinecode"
+                    <img
+                        src="https://cdn-fusion.imgcdn.store/i/2025/bd3IOsOsbxNeOFF1.png"
                         className="absolute w-full h-full flex items-center justify-center"
+                        alt="Replacement image"
                     />
                 </motion.div>
             </div>
