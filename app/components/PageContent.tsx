@@ -8,8 +8,7 @@ import { fadeIn } from "../utils/animation";
 import { useDomainCheck } from "../utils/domainCheck";
 import { Title } from "./Title";
 import { TelegramLink } from "./TelegramLink";
-
-const LazySpline = lazy(() => import("@splinetool/react-spline"));
+import Image from "next/image"; // 导入 next/image
 
 export function PageContent() {
     const configuration = use(config);
@@ -32,7 +31,6 @@ export function PageContent() {
                 visibleToasts={4}
                 toastOptions={{
                     style: {
-                        // minHeight: '100px',
                         fontSize: '1.25rem',
                     },
                 }}
@@ -47,13 +45,15 @@ export function PageContent() {
                     transition={{ duration: 0.8, delay: 1 }}
                     className="relative h-96"
                 >
-                    <img
+                    <Image
                         src="https://cdn-fusion.imgcdn.store/i/2025/bd3IOsOsbxNeOFF1.png"
-                        className="absolute w-full h-full flex items-center justify-center"
                         alt="Replacement image"
+                        fill // 替代 layout="fill"（Next.js 13+ 推荐用法）
+                        className="object-cover" // 替换 w-full h-full flex items-center justify-center
+                        priority // 可选：如果这是主要内容图片，加速加载
                     />
                 </motion.div>
             </div>
         </>
     );
-} 
+}
